@@ -1,0 +1,184 @@
+# MPM Nested CV Configuration
+
+# Project paths (relative to the project root)
+paths:
+  original_data: "data/Yilgarn_GIS_DB.csv"
+  reference_folds: null
+
+# Output directories (relative to the project root)
+output_dirs:
+  folds: "outputs/folds"
+  optuna: "outputs/optuna"
+  models: "outputs/models"
+  conformal: "outputs/conformal"
+  test_evaluation: "outputs/test_evaluation"
+  aggregated: "outputs/aggregated"
+  figures: "outputs/figures"
+  reports: "reports"
+
+# Data configuration
+data:
+  target_column: "Ni_mine"
+  coordinate_columns: ["TMX", "TMY"]
+  feature_columns:
+    # Magnetic
+    - "TMI"
+    - "RTP"
+    - "1VD"
+    # Geophysical
+    - "DGIR"
+    - "AuSREM"
+    # Proximity
+    - "Prox_Ultramafic Source"
+    - "Prox_MajorCrustal"
+    - "Prox_Fault"
+    # Worms
+    - "worms_mag_1km"
+    - "worms_mag_4.6km"
+    - "worms_mag_11km"
+    - "worms_mag_50km"
+    - "worms_grav_1km"
+    - "worms_grav_4.6km"
+    - "worms_grav_11km"
+    - "worms_grav_50km"
+    # Radiometric
+    - "K_pct"
+    - "Th_ppm"
+    - "U_ppm"
+    # Age
+    - "Tectonic Bedrock Age (MA)"
+    - "Interpreted Bedrock Age (MA)"
+  proximity_features:
+    - "Prox_Ultramafic Source"
+    - "Prox_MajorCrustal"
+    - "Prox_Fault"
+  winsorize_features:
+    - "TMI"
+    - "RTP"
+    - "1VD"
+    - "DGIR"
+  missing_indicator_threshold: 0.05
+
+# Spatial block CV configuration
+spatial_cv:
+  block_size_km: 50
+  n_outer_folds: 5
+  n_inner_folds: 5
+  stratify: true
+  random_state: 42
+
+# Optuna configuration
+optuna:
+  n_trials: 30
+  sampler: "TPE"
+  pruner: "MedianPruner"
+  pruner_n_startup_trials: 5
+  pruner_n_warmup_steps: 10
+  direction: "maximize"
+  objective_metric: "pr_auc"
+  timeout_seconds: null
+  n_jobs: 1
+
+# Bootstrap configuration
+bootstrap:
+  n_bootstraps: 50
+  random_state: 42
+
+# Conformal prediction configuration
+conformal:
+  alpha: 0.15
+  delta: 0.05
+  n_iterations: 20
+
+# Zone classification method
+zone_method: "jorc30"
+
+# Practical zone modes
+practical_zone_modes:
+  - "prob"
+  - "lift"
+
+# Zone classification thresholds
+zone_thresholds:
+  # Absolute probability scheme
+  jorc30:
+    rel_iqr_threshold: 0.30
+    prob_z0: 0.50
+    prob_z1: 0.25
+    prob_z2: 0.10
+
+  # Lift (percentile) scheme
+  lift:
+    rel_iqr_threshold: 0.30
+    lift_z0: 0.01
+    lift_z1: 0.05
+    lift_z2: 0.10
+
+  # Legacy percentile + std scheme
+  percentile_std:
+    prob_percentile_high: 98
+    prob_percentile_mod: 90
+    prob_percentile_low: 70
+    std_low: 0.0765
+    std_moderate: 0.1020
+    std_high: 0.1276
+
+# Zone definitions
+zone_definitions:
+  0:
+    name: "IMMEDIATE"
+    description: "prob >= 0.50 AND rel_IQR <= 30%"
+    color: "#d62728"
+  1:
+    name: "PRIORITY"
+    description: "high prob OR mid prob with low uncertainty"
+    color: "#ff7f0e"
+  2:
+    name: "FOLLOW_UP"
+    description: "mid prob OR low-mid prob with low uncertainty"
+    color: "#ffbb78"
+  3:
+    name: "POTENTIAL"
+    description: "remaining in_set_1 samples"
+    color: "#2ca02c"
+  4:
+    name: "EXCLUDED"
+    description: "in_set_1 = 0 (conformal excluded)"
+    color: "#9467bd"
+
+# Validation criteria
+validation_criteria:
+  coverage_min: 0.85
+  zone_0_1_capture_min: 0.25
+  zone_0_1_2_capture_min: 0.40
+  zone_4_capture_max: 0.10
+
+# Methods to evaluate
+methods:
+  - "xgboost"
+  - "baggingpu_xgboost"
+
+# Visualization configuration
+visualization:
+  figure_formats: ["png", "pdf"]
+  dpi: 300
+  figsize_single: [8, 6]
+  figsize_wide: [12, 6]
+  figsize_map: [10, 10]
+  colormap_prob: "magma"
+  colormap_std: "viridis"
+  colormap_zone: ["#d62728", "#ff7f0e", "#ffbb78", "#2ca02c", "#9467bd"]
+
+# Logging configuration
+logging:
+  level: "INFO"
+  format: "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+  file_logging: true
+  log_dir: "logs"
+
+# Random seeds
+random_seeds:
+  numpy: 42
+  sklearn: 42
+  optuna: 42
+  bootstrap: 42

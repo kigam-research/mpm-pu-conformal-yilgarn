@@ -1,0 +1,55 @@
+[project]
+name = "mpm-nested-cv"
+version = "1.0.0"
+description = "Mineral Prospectivity Mapping with Nested Cross-Validation and Conformal Prediction"
+readme = "README.md"
+requires-python = ">=3.12"
+license = {text = "MIT"}
+authors = [
+    {name = "Seongin Ahn"}, {name = "Honggeun Jo"}, {name = "Jihoe Kwon"}, {name = "Gyesoon Park"}, {name = "Sang-ho Lee", email = "energy@kigam.re.kr"}
+]
+keywords = ["mineral prospectivity", "machine learning", "nested cross-validation", "conformal prediction", "uncertainty quantification"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Science/Research",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Scientific/Engineering :: GIS",
+]
+
+dependencies = [
+    "geopandas>=1.0.0",
+    "matplotlib>=3.8.0",
+    "numba>=0.58",
+    "numpy>=2.0,<2.3",
+    "optuna>=3.5.0",
+    "pandas>=2.2.0",
+    "pulearn>=0.0.9",
+    "pyproj>=3.6.0",
+    "pyyaml>=6.0",
+    "scikit-gstat>=1.0.23",
+    "scikit-learn>=1.4.0",
+    "scipy>=1.12.0",
+    "shap>=0.44",
+    "shapely>=2.0.0",
+    "xgboost>=2.0.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.4.0",
+    "black>=23.0.0",
+    "isort>=5.12.0",
+]
+
+[project.urls]
+Homepage = "https://github.com/kigam-research/mpm-pu-conformal-yilgarn"
+Repository = "https://github.com/kigam-research/mpm-pu-conformal-yilgarn"
+Documentation = "https://github.com/kigam-research/mpm-pu-conformal-yilgarn#readme"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["scripts"]
